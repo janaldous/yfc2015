@@ -1,5 +1,8 @@
 package yfcdb.events;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+
 /**
  * Created by janaldoustorres on 19/05/15.
  */

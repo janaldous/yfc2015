@@ -9,21 +9,22 @@ import com.cedarsoftware.util.io.JsonWriter;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
 /**
  * Created by janaldoustorres on 29/05/15.
  */
 public class PersonList extends Observable {
-    private static ArrayList<Person> personArrayList;
+    private static List<Member> personArrayList;
     private static PersonList personList = new PersonList();
 
     public PersonList() {
-        personArrayList = new ArrayList<Person>();
+        personArrayList = new ArrayList<Member>();
         //uploadFromFile();
     }
 
-    public ArrayList<Person> getPersonArrayList() {
+    public List<Member> getPersonArrayList() {
         return personArrayList;
     }
 
@@ -31,22 +32,18 @@ public class PersonList extends Observable {
         return personList;
     }
 
-    public void setPersonArrayList(ArrayList<Person> personArrayList) {
-        this.personArrayList = personArrayList;
-    }
-
-    public void addPerson(Person person) {
+    public void addPerson(Member person) {
         personArrayList.add(person);
         setChanged();
         notifyObservers();
     }
 
-    public boolean contains(Person person) {
+    public boolean contains(Member person) {
         if (personArrayList.contains(person)) return true;
         return false;
     }
 
-    public boolean removePerson(Person person) {
+    public boolean removePerson(Member person) {
         setChanged();
         notifyObservers();
         return personArrayList.remove(person);
@@ -63,7 +60,7 @@ public class PersonList extends Observable {
     public String getChapterLeaders() {
         String out = "";
         for (Person person: personArrayList) {
-            if (person.getPosition().equals(Position.CHAPTER_LEADER)) {
+            if (person instanceof ChapterHead) {
                 out += person.getShortName() + "/";
             }
         }
@@ -78,7 +75,7 @@ public class PersonList extends Observable {
     public String getCoordinators() {
         String out = "";
         for (Person person: personArrayList) {
-            if (person.getPosition().equals(Position.COORDINATOR)) {
+            if (person instanceof Coordinator) {
                 out += person.getShortName() + "/";
             }
         }
@@ -89,6 +86,10 @@ public class PersonList extends Observable {
         }
         return out;
     }
+
+	public void setPersonArrayList(List<Member> list) {
+		personArrayList = list;
+	}
 
 
 }

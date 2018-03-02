@@ -1,11 +1,13 @@
 package yfcdb.view.coordinatorView;
 
 import yfcdb.events.*;
+import yfcdb.events.Event;
 import yfcdb.member.Member;
 import yfcdb.member.Person;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -24,7 +26,7 @@ public class MemberAttendancePanel extends JPanel {
         setLayout(new BorderLayout());
         String[] columnNames = {"Date", "Event", "Role"};
         defaultTableModel = new DefaultTableModel(columnNames, 0);
-        populateTable();
+        //populateTable();
 
         JTable jtTable = new JTable(defaultTableModel); //TODO fix this table
 
@@ -32,15 +34,15 @@ public class MemberAttendancePanel extends JPanel {
         add(jlPrompt, BorderLayout.SOUTH);
     }
 
-    private void populateTable() {
+    /*private void populateTable() {
         EventList eventList = EventList.getInstance();
-        ArrayList<yfcdb.events.Event> eventArrayList = eventList.getEventsAttendedBy(member);
+        List<Event> eventArrayList = eventList.getEventsAttendedBy(member);
 
-        for (yfcdb.events.Event event: eventArrayList) {
+        for (Event event: eventArrayList) {
             defaultTableModel.addRow(event.toArray(member));
         }
         setAttendedEvents();
-    }
+    }*/
 
     private void setAttendedEvents() {
         int noOfEvents = defaultTableModel.getRowCount();

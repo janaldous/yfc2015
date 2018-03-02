@@ -2,9 +2,11 @@ package yfcdb.view.coordinatorView;
 
 import yfcdb.events.*;
 import yfcdb.events.Event;
+import yfcdb.files.ExternalResource;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -32,10 +34,12 @@ public class ReportPanel extends JPanel {
     private ArrayList<ArrayList> eventArr;
     private Date start, end;
     private Calendar cStart, cEnd;
+    private ExternalResource externalResource;
 
-    public ReportPanel(Date start, Date end) {
+    public ReportPanel(Date start, Date end, ExternalResource externalResource) {
         this.start = start;
         this.end = end;
+        this.externalResource = externalResource;
         setLayout(new BorderLayout());
 
         JLabel jlTitle = new JLabel("Report");
@@ -134,7 +138,7 @@ public class ReportPanel extends JPanel {
                 for (Event event: (ArrayList<Event>)eventArr.get(index)) {
                     if (event.getType().equals(type)) {
                         date += event.getDay() + ",";
-                        attendees += event.getNoOfAttendees() + ",";
+                        attendees += externalResource.getNoOfEventAttendees(event) + ",";
                     }
                 }
                 if (!date.isEmpty()) {

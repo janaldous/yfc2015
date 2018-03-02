@@ -2,12 +2,14 @@ package yfcdb.view.coordinatorView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import yfcdb.events.Event;
 import yfcdb.events.EventList;
+import yfcdb.files.ExternalResource;
 
 /**
  * Created by janaldoustorres on 31/05/15.
@@ -17,41 +19,47 @@ public class EventsInfoPanel extends JPanel {
     private final MembersAttendanceTablePanel membersAttendanceTablePanel;
     private Event event;
     private MainWindow mainWindow;
+    private ExternalResource externalResource;
 
     private class EventInfoPanelListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            boolean success = true;
-            if (event == null) {
-                event = new Event();
-                eventPanel.setEvent(event);
-            }
-            if (!eventPanel.isFilledOut()) {
-                success = false;
-            }
+            
+            boolean success = eventPanel.isFilledOut();
+            
             if (success) {
-                JOptionPane.showMessageDialog(null, "Success");
-                updateEvent();
-                EventList eventList = EventList.getInstance();
+            	updateEvent();
+            	event = membersAttendanceTablePanel.getEvent();
+            	System.out.println("="+event.getStartDate());
+
+            	externalResource.updateOrSaveEvent(event);
+            	changeMainWindow();
+
+            	EventList eventList = EventList.getInstance();
                 if (!eventList.contains(event)) {
                     eventList.addEvent(event);
                     eventList.print();
                 }
+                JOptionPane.showMessageDialog(null, "Success");
             } else {
                 JOptionPane.showMessageDialog(null, "Not filled out");
             }
         }
     }
 
-    public EventsInfoPanel(final MainWindow mainWindow) {
+    public EventsInfoPanel(final MainWindow mainWindow, 
+    		ExternalResource externalResource) {
         this.mainWindow = mainWindow;
+        this.externalResource = externalResource;
+        this.event = new Event();
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(20, 20, 20, 20) );
 
         JPanel centerPanel = new JPanel(new GridLayout(2,1));
-        eventPanel = new EventPanel();
-        membersAttendanceTablePanel = new MembersAttendanceTablePanel();
+        
+        eventPanel = new EventPanel(event);
+        membersAttendanceTablePanel = new MembersAttendanceTablePanel(externalResource, event);
         centerPanel.add(eventPanel);
         centerPanel.add(membersAttendanceTablePanel);
 
@@ -73,24 +81,32 @@ public class EventsInfoPanel extends JPanel {
 
         add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+        
+        
     }
 
-    public EventsInfoPanel(MainWindow mainWindow, String title) {
-        this(mainWindow);
+    public EventsInfoPanel(MainWindow mainWindow, String title, 
+    		ExternalResource externalResource) {
+        this(mainWindow, new Event(), externalResource);
         String html = "<html><h1>" + title + "</h1></html>";
         add(new JLabel(html), BorderLayout.NORTH);
     }
-
-    public EventsInfoPanel(MainWindow mainWindow, Event event) {
-        this(mainWindow);
-        this.event = event;
-        eventPanel.setInfo(event);
-        membersAttendanceTablePanel.setInfo(event);
+    
+    public EventsInfoPanel(final MainWindow mainWindow, Event event, 
+    		ExternalResource externalResource) {
+    	this(mainWindow, externalResource);
+    	eventPanel.setEvent(event);
+    	eventPanel.setInfo(event);
+    	membersAttendanceTablePanel.setEvent(event);
+    	membersAttendanceTablePanel.setInfo(event);
     }
-
+    
     public void updateEvent() {
-        eventPanel.updateEvent(event);
-        membersAttendanceTablePanel.updateEvent(event);
+        eventPanel.updateEvent();
+        membersAttendanceTablePanel.updateEvent();
+    }
+    
+    public void changeMainWindow() {
         mainWindow.changeCenterPanelToEvent(event);
     }
 

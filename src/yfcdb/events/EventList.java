@@ -4,13 +4,14 @@ import yfcdb.member.Person;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 
 /**
  * Created by janaldoustorres on 01/06/15.
  */
 public class EventList extends Observable {
-    private static ArrayList<Event> eventArrayList;
+    private static List<Event> eventArrayList;
     private static EventList eventList = new EventList();
 
     public EventList() {
@@ -21,8 +22,8 @@ public class EventList extends Observable {
         return eventList;
     }
 
-    public void setEventArrayList(ArrayList<Event> eventArrayList) {
-        this.eventArrayList = eventArrayList;
+    public void setEventArrayList(List<Event> list) {
+        this.eventArrayList = list;
     }
 
     public void addEvent(Event event) {
@@ -52,7 +53,7 @@ public class EventList extends Observable {
     }
 
     //TODO potentially dangerous to do this. should not reveal insides
-    public ArrayList<Event> getEventArrayList() {
+    public List<Event> getEventArrayList() {
         return eventArrayList;
     }
 
@@ -87,8 +88,8 @@ public class EventList extends Observable {
         return list;
     }
 
-    public ArrayList<Event> getPastoralFormationEvents() {
-        ArrayList<Event> list = new ArrayList<Event>();
+    public List<Event> getPastoralFormationEvents() {
+        List<Event> list = new ArrayList<Event>();
         for (Event event: eventArrayList) {
             if (event.getType().isPastoralFormation()) {
                 list.add(event);
@@ -97,8 +98,8 @@ public class EventList extends Observable {
         return list;
     }
 
-    public ArrayList<Event> getEventsAttendedBy(Person person) {
-        ArrayList<Event> list = new ArrayList<Event>();
+    /*public List<Event> getEventsAttendedBy(Person person) {
+        List<Event> list = new ArrayList<Event>();
         for (Event event: eventArrayList) {
             if (event.wasAttendedBy(person)) {
                 list.add(event);
@@ -106,5 +107,5 @@ public class EventList extends Observable {
         }
 
         return list;
-    }
+    }*/
 }

@@ -15,4 +15,12 @@ public enum Prefix {
             default: return null;
         }
     }
+    
+    public static Relationship toRelationship(Prefix prefix) {
+    	switch(prefix) {
+    		case TITO: return Relationship.FATHER;
+    		case TITA: return Relationship.MOTHER;
+    		default: return null;
+    	}
+    }
 }

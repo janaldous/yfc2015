@@ -2,10 +2,12 @@ package yfcdb.files;
 
 import yfcdb.events.Event;
 import yfcdb.events.EventList;
+import yfcdb.member.Member;
 import yfcdb.member.Person;
 import yfcdb.member.PersonList;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by janaldoustorres on 03/06/15.
@@ -13,8 +15,8 @@ import java.util.ArrayList;
 public class YFCFiles {
     //private PersonList personList;
     //private EventList eventList;
-    private ArrayList<Person> personArrayList;
-    private ArrayList<Event> eventArrayList;
+    private List<Member> personArrayList;
+    private List<Event> eventArrayList;
 
 
     public YFCFiles() {
@@ -24,11 +26,11 @@ public class YFCFiles {
         eventArrayList = eventList.getEventArrayList();
     }
 
-    public ArrayList<Person> getPersonArrayList() {
+    public List<Member> getPersonArrayList() {
         return personArrayList;
     }
 
-    public ArrayList<Event> getEventArrayList() {
+    public List<Event> getEventArrayList() {
         return eventArrayList;
     }
 

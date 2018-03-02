@@ -2,10 +2,13 @@ package yfcdb.view.coordinatorView;
 
 import yfcdb.events.Event;
 import yfcdb.events.EventList;
+import yfcdb.files.DatabaseConnection;
+import yfcdb.files.ExternalResource;
 import yfcdb.files.Files;
 import yfcdb.member.*;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
@@ -23,6 +26,7 @@ public class MainWindow extends JFrame {
     final static JPanel emptyPanel = new JPanel();
     private final SidePanel sidePanel = new SidePanel();
     private final static Dimension preferredSize = new Dimension(1000, 700);
+    private ExternalResource externalResource;
 
     private class SidePanel extends JPanel implements Observer {
         private JTextField jtfSearchBar;
@@ -175,7 +179,8 @@ public class MainWindow extends JFrame {
         setTitle("YFC");
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                saveFiles(); System.exit(EXIT_ON_CLOSE);
+                saveFiles(); 
+                System.exit(EXIT_ON_CLOSE);
             }
         });
 
@@ -189,7 +194,7 @@ public class MainWindow extends JFrame {
         pack();
     }
 
-    private MenuBar setupMenuBar() {
+	private MenuBar setupMenuBar() {
         MenuBar menuBar = new MenuBar();
         Menu mFile = new Menu("File");
         MenuItem miAbout = new MenuItem("About");
@@ -328,14 +333,14 @@ public class MainWindow extends JFrame {
     }
 
     private void changeCenterPanelToPastoralFormation() {
-        changeCenterPanel(new PastoralFormationTablePanel());
+        changeCenterPanel(new PastoralFormationTablePanel(externalResource));
     }
 
     private void changeCenterPanelToNewEvent() {
         //TODO make MemberInfoPanel a singleton, to make it more efficient
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JLabel("<html><h1>New Event</h1></html>"), BorderLayout.NORTH);
-        panel.add(new EventsInfoPanel(this), BorderLayout.CENTER);
+        panel.add(new EventsInfoPanel(this, externalResource), BorderLayout.CENTER);
         changeCenterPanel(panel);
     }
 
@@ -343,18 +348,18 @@ public class MainWindow extends JFrame {
         //TODO make MemberInfoPanel a singleton, to make it more efficient
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JLabel("<html><h1>New Member</h1></html>"), BorderLayout.NORTH);
-        panel.add(new JScrollPane(new MemberInfoPanel(this, new Member())), BorderLayout.CENTER);
+        panel.add(new JScrollPane(new MemberInfoPanel(this, new Member(), externalResource)), BorderLayout.CENTER);
         changeCenterPanel(panel);
     }
 
     public void changeCenterPanelToMember(Member member) {
         //TODO make MemberInfoPanel a singleton, to make it more efficient
-        changeCenterPanel(new MemberTabbedPanel(this, member));
+        changeCenterPanel(new MemberTabbedPanel(this, member, externalResource));
     }
 
     public void changeCenterPanelToEvent(Event event) {
         //TODO make MemberInfoPanel a singleton, to make it more efficient
-        changeCenterPanel(new EventsInfoPanel(this, event));
+        changeCenterPanel(new EventsInfoPanel(this, event, externalResource));
     }
 
     private void changeCenterPanelToMemberTable() {
@@ -366,7 +371,7 @@ public class MainWindow extends JFrame {
     }
 
     public void changeCenterPanelToReportTable(Date start, Date end) {
-        changeCenterPanel(new ReportPanel(start, end));
+        changeCenterPanel(new ReportPanel(start, end, externalResource));
     }
 
     public void changeCenterPanelToEmpty() {
@@ -382,23 +387,23 @@ public class MainWindow extends JFrame {
     }
 
     private void showWizardDialog() {
-        new ReportWizardDialog(this).setVisible(true);
+        new ReportWizardDialog(this, externalResource).setVisible(true);
     }
 
     private void saveFiles() {
         try {
-            Files.saveToFile();
-            JOptionPane.showMessageDialog(this, "File saved");
+        	externalResource.saveToFile();
+            ///JOptionPane.showMessageDialog(this, "File saved");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+    
     private void uploadFiles() {
+    	externalResource = new DatabaseConnection();
         try {
-            Files.uploadFromFile();
+        	externalResource.uploadFromFile();
             sidePanel.populateLists();
-            JOptionPane.showMessageDialog(this, "Upload successful");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

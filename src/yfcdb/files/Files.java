@@ -2,26 +2,33 @@ package yfcdb.files;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
+
+import yfcdb.events.Attendee;
+import yfcdb.events.Event;
 import yfcdb.events.EventList;
+import yfcdb.member.Member;
 import yfcdb.member.PersonList;
 
 import javax.swing.*;
+
 import java.io.*;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by janaldoustorres on 03/06/15.
  */
-public class Files {
+public class Files extends ExternalResource {
     private final static String filename = "yfc.json";
 
-    public static void saveToFile() throws IOException {
+    public void saveToFile() throws IOException {
         FileWriter file = new FileWriter(filename);
         file.write(JsonWriter.objectToJson(new YFCFiles()));
         file.flush();
         file.close();
     }
 
-    public static void uploadFromFile() throws FileNotFoundException, IOException {
+    public void uploadFromFile() throws FileNotFoundException, IOException {
         JsonReader jr = new JsonReader(new FileInputStream(filename));
         YFCFiles yfcFiles = (YFCFiles)jr.readObject();
         PersonList personList = PersonList.getInstance();
@@ -71,4 +78,31 @@ public class Files {
             JOptionPane.showMessageDialog(null, "Saved as yfc.json");
         }
     }
+
+	@Override
+	public void updateOrSaveMember(Member member) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateOrSaveEvent(Event event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Iterator<Attendee> getEventAttendeesIterator(Event event) {
+		return event.getAttendees().iterator();
+	}
+
+	@Override
+	public int getNoOfEventAttendees(Event event) {
+		return event.getAttendees().size();
+	}
+
+	@Override
+	public List<Attendee> getEventAttendees(Event event) {
+		return event.getAttendees();
+	}
 }

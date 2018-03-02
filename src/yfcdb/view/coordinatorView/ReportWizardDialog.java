@@ -1,10 +1,12 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.files.ExternalResource;
 import yfcdb.files.XSLXReport;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +23,7 @@ public class ReportWizardDialog extends JDialog implements ActionListener {
     private final DateSpinner dateSpinner;
     private final JComboBox jcbFileType;
     private MainWindow mainWindow;
+    private ExternalResource externalResource;
 
     private class DateSpinner extends JPanel implements ChangeListener {
         private final JSpinner spinner;
@@ -61,8 +64,9 @@ public class ReportWizardDialog extends JDialog implements ActionListener {
         }
     }
 
-    public ReportWizardDialog(MainWindow mainWindow) {
+    public ReportWizardDialog(MainWindow mainWindow, ExternalResource externalResource) {
         this.mainWindow = mainWindow;
+        this.externalResource = externalResource;
         setLayout(new GridLayout(5, 2));
         setTitle("Report Wizard");
 
@@ -121,7 +125,7 @@ public class ReportWizardDialog extends JDialog implements ActionListener {
             cal.set(Calendar.MONTH, Calendar.DECEMBER);
             Date end = cal.getTime();
 
-            new XSLXReport(title, footer, start, end);
+            new XSLXReport(title, footer, start, end, externalResource);
 
             mainWindow.changeCenterPanelToReportTable(start, end);
             this.setVisible(false);

@@ -78,8 +78,8 @@ public class CoordinatorInfoPanel extends JPanel implements PersonInfoPanelTempl
         }
 
         public void setInfo(Coordinator coordinator) {
-            jtfId.setText(String.valueOf(coordinator.getID()));
-            jtfDateLastUpdated.setText(coordinator.getDateUpdated());
+            jtfId.setText(String.valueOf(coordinator.getId()));
+            jtfDateLastUpdated.setText(coordinator.getDateUpdated().toString());
             jtfAge.setText(String.valueOf(coordinator.getAge()));
             jtfYfcAge.setText(String.valueOf(coordinator.getYfcAge()));
             jcbPosition.setSelectedItem(coordinator.getPosition());
@@ -90,13 +90,12 @@ public class CoordinatorInfoPanel extends JPanel implements PersonInfoPanelTempl
             Position position = (Position) jcbPosition.getSelectedItem();
             int entryYear = Integer.parseInt((String)jcbEntryYear.getSelectedItem());
             coordinator.setPosition(position);
-            coordinator.setDateUpdated();
             coordinator.setYfcEntryYear(entryYear);
         }
 
         private void setInfoForNewCoordinator(Coordinator coordinator) {
-            jtfId.setText(String.valueOf(coordinator.getID()));
-            jtfDateLastUpdated.setText(coordinator.getDateUpdated());
+            jtfId.setText(String.valueOf(coordinator.getId()));
+            jtfDateLastUpdated.setText("");
             jcbPosition.setSelectedItem(coordinator.getPosition());
             jtfAge.setText("0");
             jtfYfcAge.setText("0");
@@ -242,8 +241,8 @@ public class CoordinatorInfoPanel extends JPanel implements PersonInfoPanelTempl
 
         public void setInfo(Coordinator coordinator) {
             Address address = coordinator.getAddress();
-            jtfAddressStreet.setText(address.getStreet());
-            jtfAddressVillage.setText(address.getVillage());
+            jtfAddressStreet.setText(address.getAddress1());
+            jtfAddressVillage.setText(address.getAddress2());
             jtfAddressCity.setText(address.getCity());
             jtfPostCode.setText(address.getPostalCode());
             jtfContact.setText(coordinator.getCellphoneNumber());
@@ -257,7 +256,7 @@ public class CoordinatorInfoPanel extends JPanel implements PersonInfoPanelTempl
             String postalCode = jtfPostCode.getText();
             String contact = jtfContact.getText();
             String email = jtfEmail.getText();
-            Address address = new Address(street, city, village, postalCode);
+            Address address = new Address(street, city, village, "province", postalCode);
             coordinator.setAddress(address);
             coordinator.setCellphoneNumber(contact);
             coordinator.setEmail(email);

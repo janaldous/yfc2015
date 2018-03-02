@@ -1,11 +1,30 @@
 package yfcdb.member;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * Created by janaldoustorres on 19/05/15.
  */
+@Entity
 public class YFCGroup {
-    private String sector, cluster;
-
+	@Id
+	@GeneratedValue
+	private int id;
+	
+    @Column(name="sector")
+	private String sector;
+	
+    @Column(name="cluster")
+	private String cluster;
+    
+    public YFCGroup() {
+    	
+    }
+    
     public YFCGroup(String sector, String cluster) {
         this.sector = sector;
         this.cluster = cluster;

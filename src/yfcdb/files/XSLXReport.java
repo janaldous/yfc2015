@@ -46,12 +46,15 @@ public class XSLXReport {
     private int row = 7;
     private int startOfData = 7;
     private String[] monthStr;
+    private ExternalResource externalResource;
 
-    public XSLXReport(String title, String footerStr, Date start, Date end) {
+    public XSLXReport(String title, String footerStr, Date start, Date end, 
+    		ExternalResource externalResource) {
         this.title = title;
         this.footerStr = footerStr;
         this.start = start;
         this.end = end;
+        this.externalResource = externalResource;
         wb = new HSSFWorkbook();
         sheet = wb.createSheet("Activity Report");
         PrintSetup ps = sheet.getPrintSetup();
@@ -307,7 +310,7 @@ public class XSLXReport {
         for (yfcdb.events.Event event : (ArrayList<yfcdb.events.Event>) eventArr.get(index)) {
             if (event.getType().equals(type)) {
                 date += event.getDay() + ",";
-                attendees += event.getNoOfAttendees() + ",";
+                attendees += externalResource.getNoOfEventAttendees(event) + ",";
             }
         }
         if (!date.isEmpty()) {

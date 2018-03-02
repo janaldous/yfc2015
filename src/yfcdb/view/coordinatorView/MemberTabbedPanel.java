@@ -1,8 +1,10 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.files.ExternalResource;
 import yfcdb.member.Member;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 /**
@@ -12,14 +14,14 @@ public class MemberTabbedPanel extends JPanel {
     private Member member;
     private MainWindow mainWindow;
 
-    public MemberTabbedPanel(MainWindow mainWindow, Member member) {
+    public MemberTabbedPanel(MainWindow mainWindow, Member member, ExternalResource externalResource) {
         this.mainWindow = mainWindow;
         this.member = member;
 
         setLayout(new BorderLayout());
 
         JTabbedPane jtpTabs = new JTabbedPane();
-        jtpTabs.addTab("Personal", new JScrollPane(new MemberInfoPanel(mainWindow, member)));
+        jtpTabs.addTab("Personal", new JScrollPane(new MemberInfoPanel(mainWindow, member, externalResource)));
         jtpTabs.addTab("Household", new MemberHouseholdPanel(member));
         jtpTabs.addTab("Attendance", new MemberAttendancePanel(member));
         //jtpTabs.add("Upcoming events", new JScrollPane(new UpcomingEventsPanel()));

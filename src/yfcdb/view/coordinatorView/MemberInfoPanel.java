@@ -1,10 +1,12 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.files.ExternalResource;
 import yfcdb.member.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,8 +82,8 @@ public class MemberInfoPanel extends JPanel {
         }
 
         public void setInfo(Member member) {
-            jtfId.setText(String.valueOf(member.getID()));
-            jtfDateLastUpdated.setText(member.getDateUpdated());
+            jtfId.setText(String.valueOf(member.getId()));
+            jtfDateLastUpdated.setText(member.getDateUpdated().toString());
             jtfAge.setText(String.valueOf(member.getAge()));
             jtfYfcAge.setText(String.valueOf(member.getYfcAge()));
             jcbPosition.setSelectedItem(member.getPosition());
@@ -93,14 +95,13 @@ public class MemberInfoPanel extends JPanel {
             Position position = (Position) jcbPosition.getSelectedItem();
             int entryYear = Integer.parseInt((String)jcbEntryYear.getSelectedItem());
             member.setPosition(position);
-            member.setDateUpdated();
             member.setYfcEntryYear(entryYear);
-            return null;
+            return member;
         }
 
         private void setInfoForNewMember(Member member) {
-            jtfId.setText(String.valueOf(member.getID()));
-            jtfDateLastUpdated.setText(member.getDateUpdated());
+            jtfId.setText("tba");
+            jtfDateLastUpdated.setText("n/a");
             jcbPosition.setSelectedItem(member.getPosition());
             jtfAge.setText("0");
             jtfYfcAge.setText("0");
@@ -163,7 +164,7 @@ public class MemberInfoPanel extends JPanel {
     
     public class PersonalPanel extends FormPanel {
         private final String[] yesNoList = new String[] {"N", "Y"};
-        private final String[] genderList = new String[] {"M", "F"};
+        private final Gender[] genderList = Gender.values();
         private DatePanel dpBirthday;
         private JComboBox jcbGender, jcbKfcTransfer, jcbBloodType, jcbShirtSize;
 
@@ -174,7 +175,7 @@ public class MemberInfoPanel extends JPanel {
             dpBirthday = new DatePanel(briefingPanel);
 
             JLabel jlGender = new JLabel("Gender *:");
-            jcbGender = new JComboBox<String>(genderList);
+            jcbGender = new JComboBox<Gender>(genderList);
 
             JLabel jlKfcTransfer = new JLabel("KFC to YFC:");
             jcbKfcTransfer = new JComboBox<String>(yesNoList);
@@ -223,7 +224,7 @@ public class MemberInfoPanel extends JPanel {
         @Override
         public Member getInfo(Member member) {
             Date birthday = dpBirthday.getDate();
-            String gender = jcbGender.getSelectedItem().toString();
+            Gender gender = (Gender) jcbGender.getSelectedItem();
             String transferee = jcbKfcTransfer.getSelectedItem().toString();
             boolean kfcTransfer = (transferee.equals("Y")) ? true : false;
             BloodType bloodType = (BloodType) jcbBloodType.getSelectedItem();
@@ -233,33 +234,39 @@ public class MemberInfoPanel extends JPanel {
             member.setKfcToYfc(kfcTransfer);
             member.setBloodType(bloodType);
             member.setShirtSize(shirtSize);
-            return null;
+            return member;
         }
     }
 
     public class ContactPanel extends FormPanel {
-        private String[] villages = {"SRV1", "SRV2", "SRV3", "SRV4", "SRE1", "SRE2", "SJV1", "SJV2", "SJV3",
+        private final String[] VILLAGES = {"SRV1", "SRV2", "SRV3", "SRV4", "SRE1", "SRE2", "SJV1", "SJV2", "SJV3",
                 "La Residencia", "Inchikan"};
-        private String[] cities = {"Sta Rosa", "Biñan"};
-        private JTextField jtfAddressStreet, jtfPostCode, jtfContact, jtfEmail;
+        private final String[] CITIES = {"Sta Rosa", "Biñan"};
+        private JTextField jtfAddressStreet, jtfPostCode, jtfContact, jtfEmail, jtfAddressProvince;
         private JComboBox<String> jcbAddressVillage, jcbAddressCity;
-
+        private final int NUMBER_OF_FIELDS = 7;
+        
         private ContactPanel() {
-            setLayout(new GridLayout(6, 1));
+            setLayout(new GridLayout(NUMBER_OF_FIELDS, 1));
             setBorder(BorderFactory.createTitledBorder("Contact"));
             JLabel jlAddressStreet = new JLabel("Address (Street) *:");
             jtfAddressStreet = new JTextField();
 
             JLabel jlAddressVillage = new JLabel("Address (Village) *:");
-            jcbAddressVillage = new JComboBox<String>(villages);
+            jcbAddressVillage = new JComboBox<String>(VILLAGES);
             jcbAddressVillage.setEditable(true);
 
             JLabel jlAddressCity = new JLabel("Address (City)");
-            jcbAddressCity = new JComboBox<String>(cities);
+            jcbAddressCity = new JComboBox<String>(CITIES);
             jcbAddressCity.setEditable(true);
+            
+            JLabel jlAddressProvince = new JLabel("Province");
+            jtfAddressProvince = new JTextField("Laguna");
+            jtfAddressProvince.setEditable(false);
 
             JLabel jlPostCode = new JLabel("Post code");
             jtfPostCode = new JTextField("4026");
+            jtfPostCode.setEditable(false);
 
             JLabel jlContact = new JLabel("Contact No *:");
             jtfContact = new JTextField();
@@ -273,6 +280,8 @@ public class MemberInfoPanel extends JPanel {
             add(jcbAddressVillage);
             add(jlAddressCity);
             add(jcbAddressCity);
+            add(jlAddressProvince);
+            add(jtfAddressProvince);
             add(jlPostCode);
             add(jtfPostCode);
             add(jlContact);
@@ -283,12 +292,15 @@ public class MemberInfoPanel extends JPanel {
 
         public void setInfo(Member member) {
             Address address = member.getAddress();
-            jtfAddressStreet.setText(address.getStreet());
-            jcbAddressVillage.setSelectedItem(address.getVillage());
-            jcbAddressCity.setSelectedItem(address.getCity());
-            jtfPostCode.setText(address.getPostalCode());
-            jtfContact.setText(member.getCellphoneNumber());
-            jtfEmail.setText(member.getEmail());
+            if(address != null) {
+            	jtfAddressStreet.setText(address.getAddress1());
+                jcbAddressVillage.setSelectedItem(address.getAddress2());
+                jcbAddressCity.setSelectedItem(address.getCity());
+                jtfAddressProvince.setText(address.getProvince());
+                jtfPostCode.setText(address.getPostalCode());
+                jtfContact.setText(member.getCellphoneNumber());
+                jtfEmail.setText(member.getEmail());
+            }
         }
 
         @Override
@@ -296,10 +308,11 @@ public class MemberInfoPanel extends JPanel {
             String street = jtfAddressStreet.getText();
             String village = (String)jcbAddressVillage.getSelectedItem();
             String city = (String)jcbAddressCity.getSelectedItem();
+            String province = jtfAddressProvince.getText();
             String postalCode = jtfPostCode.getText();
             String contact = jtfContact.getText();
             String email = jtfEmail.getText();
-            Address address = new Address(street, city, village, postalCode);
+            Address address = new Address(street, village, city, province, postalCode);
             member.setAddress(address);
             member.setCellphoneNumber(contact);
             member.setEmail(email);
@@ -340,10 +353,12 @@ public class MemberInfoPanel extends JPanel {
         }
 
         public void setInfo(Member member) {
-            Education education = member.getEducation();
-            jtfSchool.setText(education.getSchool());
-            jcbGradeLevel.setSelectedItem(education.getLevel());
-            jtfCollegeCourse.setText(education.getCourse());
+        	if(member.getEducation() != null) {
+        		Education education = member.getEducation();
+                jtfSchool.setText(education.getSchool());
+                jcbGradeLevel.setSelectedItem(education.getLevel());
+                jtfCollegeCourse.setText(education.getCourse());
+        	}
         }
 
         @Override
@@ -351,295 +366,45 @@ public class MemberInfoPanel extends JPanel {
             String school = jtfSchool.getText();
             String level = jcbGradeLevel.getSelectedItem().toString();
             String course = jtfCollegeCourse.getText();
-            Education education = new Education(school, level, course);
+            Education education = new Education();
+            education.setSchool(school);
+            education.setLevel(level);
+            education.setCourse(course);
             member.setEducation(education);
             return member;
         }
     }
-
+    
     public class ParentPanel extends FormPanel {
-        private JTextField jtfFatherName, jtfFatherContact, jtfFatherEmail, jtfFatherOccupation;
-        private JTextField jtfMotherName, jtfMotherContact, jtfMotherEmail, jtfMotherOccupation;
-
+        FormPanel jpFather, jpMother;
+    	
         private ParentPanel() {
             setLayout(new GridLayout(1, 2));
             setBorder(BorderFactory.createTitledBorder("Parents"));
-            JPanel jpFather = new JPanel(new GridLayout(4,2));
-            JLabel jlFatherName = new JLabel("Father Name:");
-            jtfFatherName = new JTextField();
-
-            JLabel jlFatherContact = new JLabel("Father Contact No:");
-            jtfFatherContact = new JTextField();
-
-            JLabel jlFatherEmail = new JLabel("Father Email:");
-            jtfFatherEmail = new JTextField();
-
-            JLabel jlFatherOccupation = new JLabel("Father Occupation:");
-            jtfFatherOccupation = new JTextField();
-
-            jpFather.add(jlFatherName);
-            jpFather.add(jtfFatherName);
-            jpFather.add(jlFatherContact);
-            jpFather.add(jtfFatherContact);
-            jpFather.add(jlFatherEmail);
-            jpFather.add(jtfFatherEmail);
-            jpFather.add(jlFatherOccupation);
-            jpFather.add(jtfFatherOccupation);
-
-            JPanel jpMother = new JPanel(new GridLayout(4,2));
-            JLabel jlMotherName = new JLabel("Mother Name:");
-            jtfMotherName = new JTextField();
-
-            JLabel jlMotherContact = new JLabel("Mother Contact No:");
-            jtfMotherContact = new JTextField();
-
-            JLabel jlMotherEmail = new JLabel("Mother Email:");
-            jtfMotherEmail = new JTextField();
-
-            JLabel jlMotherOccupation = new JLabel("Mother Occupation:");
-            jtfMotherOccupation = new JTextField();
-
-            jpMother.add(jlMotherName);
-            jpMother.add(jtfMotherName);
-            jpMother.add(jlMotherContact);
-            jpMother.add(jtfMotherContact);
-            jpMother.add(jlMotherEmail);
-            jpMother.add(jtfMotherEmail);
-            jpMother.add(jlMotherOccupation);
-            jpMother.add(jtfMotherOccupation);
+            jpFather = new OneParentPanel(Relationship.FATHER);
+            jpMother = new OneParentPanel(Relationship.MOTHER);
 
             add(jpFather);
             add(jpMother);
         }
 
         public void setInfo(Member member) {
-            Parent father = member.getFather();
-            Parent mother = member.getMother();
-            if (!(father.getPerson() instanceof Coordinator)) {
-                jtfFatherName.setEditable(false);
-                jtfFatherContact.setEditable(false);
-                jtfFatherEmail.setEditable(false);
-                jtfFatherOccupation.setEditable(false);
-            }
-            if (!(mother.getPerson() instanceof Coordinator)) {
-                jtfMotherName.setEditable(false);
-                jtfMotherEmail.setEditable(false);
-                jtfMotherContact.setEditable(false);
-                jtfMotherOccupation.setEditable(false);
-            }
-            jtfFatherName.setText(father.getName());
-            jtfFatherContact.setText(father.getContact());
-            jtfFatherEmail.setText(father.getEmail());
-            jtfFatherOccupation.setText(father.getOccupation());
-            jtfMotherName.setText(mother.getName());
-            jtfMotherContact.setText(mother.getContact());
-            jtfMotherEmail.setText(mother.getEmail());
-            jtfMotherOccupation.setText(mother.getOccupation());
-        }
-
-        @Override
-        public Member getInfo(Member member) {
-            String fName = jtfFatherName.getText();
-            String fContact = jtfFatherContact.getText();
-            String fEmail = jtfFatherEmail.getText();
-            String fOccupation = jtfFatherOccupation.getText();
-            String mName = jtfMotherName.getText();
-            String mContact = jtfMotherContact.getText();
-            String mEmail = jtfMotherEmail.getText();
-            String mOccupation = jtfMotherOccupation.getText();
-
-            if (member.getFather() != null && !(member.getFather().getPerson() instanceof Coordinator)) {
-                Parent father = new Parent("Father", fName, fOccupation, fContact, fEmail);
-                member.setFather(father);
-            }
-            if (member.getMother() != null && !(member.getMother().getPerson() instanceof Coordinator)) {
-                Parent mother = new Parent("Mother", mName, mOccupation, mContact, mEmail);
-                member.setMother(mother);
-            }
-            return null;
-        }
-    }
-
-    public class EmergencyContactPanel extends FormPanel {
-        private JCheckBox jchbFather, jchbMother, jchbOther;
-        private JTextField jtfName, jtfRelation, jtfContact;
-        private OtherEmergencyContactPanel otherEmergencyContactPanel;
-        private class OtherEmergencyContactPanel extends JPanel {
-            private OtherEmergencyContactPanel() {
-                JLabel jlName = new JLabel("Name:");
-                jtfName = new JTextField(15);
-                JLabel jlRelation = new JLabel("Relationship:");
-                jtfRelation = new JTextField(10);
-                JLabel jlContact = new JLabel("Contact:");
-                jtfContact = new JTextField(15);
-
-                add(jlName);
-                add(jtfName);
-                add(jlRelation);
-                add(jtfRelation);
-                add(jlContact);
-                add(jtfContact);
-            }
-
-            private void setInfo(EmergencyContact ec) {
-                jtfName.setText(ec.getName());
-                jtfRelation.setText(ec.getRelationship());
-                jtfContact.setText(ec.getContactNo());
-            }
-
-            private EmergencyContact getEmergencyContact() {
-                String name = jtfName.getText();
-                String relationship = jtfRelation.getText();
-                String contact = jtfContact.getText();
-                EmergencyContact emergencyContact = new EmergencyContact(name, relationship, contact);
-                return emergencyContact;
-            }
-        }
-
-        private EmergencyContactPanel() {
-            setLayout(new BorderLayout());
-            setBorder(BorderFactory.createTitledBorder("Emergency Contact"));
-
-            JLabel jlEmergencyPrompt = new JLabel("Choose emergency contacts:");
-            jchbFather = new JCheckBox("Father");
-            jchbMother = new JCheckBox("Mother");
-            jchbOther = new JCheckBox("Other");
-            jchbOther.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (((JCheckBox)e.getItem()).isSelected()) {
-                        otherEmergencyContactPanel = new OtherEmergencyContactPanel();
-                        add(otherEmergencyContactPanel, BorderLayout.SOUTH);
-                        revalidate();
-                        repaint();
-                    } else {
-                        remove(otherEmergencyContactPanel);
-                        revalidate();
-                        repaint();
-                    }
-                }
-            });
-
-            JPanel jpChoices = new JPanel();
-            jpChoices.add(jlEmergencyPrompt);
-            jpChoices.add(jchbFather);
-            jpChoices.add(jchbMother);
-            jpChoices.add(jchbOther);
-
-            add(jpChoices, BorderLayout.CENTER);
-        }
-
-        public void setInfo(Member member) {
-            for (EmergencyContact ec: member.getEmergencyContactList()) {
-                if (ec.equals(member.getMother())) {
-                    jchbMother.setSelected(true);
-                } else if (ec.equals(member.getFather())) {
-                    jchbFather.setSelected(true);
-                } else {
-                    jchbOther.setSelected(true);
-                    otherEmergencyContactPanel.setInfo(ec);
-                }
+        	if(member.getFather()!=null) {
+        		jpFather.setInfo(member);
+        	}
+            if(member.getMother()!=null) {
+            	jpMother.setInfo(member);
             }
         }
 
         @Override
         public Member getInfo(Member member) {
-            ArrayList<EmergencyContact> ecList = member.getEmergencyContactList();
-            if (jchbFather.isSelected() && !ecList.contains(member.getFather())) {
-                ecList.add(member.getFather().toEmergencyContact());
-            } else if (jchbMother.isSelected() && !ecList.contains(member.getMother())) {
-                ecList.add(member.getMother().toEmergencyContact());
-            } else if (jchbOther.isSelected()) {
-                if (ecList.get(ecList.size()-1).getParent() != member.getMother() ||
-                        ecList.get(ecList.size()-1).getParent() != member.getFather()) {
-                    EmergencyContact emergencyContact = otherEmergencyContactPanel.getEmergencyContact();
-                    ecList.add(emergencyContact);
-                }
-            }
-            return member;
+			member = jpFather.getInfo(member);
+			member = jpMother.getInfo(member);
+        	return member;
         }
     }
-
-    public class SeminarsTablePanel extends FormPanel {
-        private DefaultTableModel defaultTableModel;
-
-        public SeminarsTablePanel() {
-            setLayout(new BorderLayout());
-            JLabel jlSeminarPrompt = new JLabel("Seminars/Retreats attended (religious, extracurriculars, etc)");
-
-            String[] columnNames = {"Name of school/organization", "Position/Nature of service"};
-            defaultTableModel = new DefaultTableModel(columnNames, 0);
-
-            JTable jtSeminarTable = new JTable(defaultTableModel);
-
-            JScrollPane jsp = new JScrollPane(jtSeminarTable);
-            jsp.setPreferredSize(new Dimension(200, jtSeminarTable.getRowHeight()*5));
-            add(jlSeminarPrompt, BorderLayout.NORTH);
-            add(jsp, BorderLayout.CENTER);
-        }
-
-        public void setInfo(Member member) {
-            for(SeminarRetreat sr: member.getSeminarRetreatList()) {
-                defaultTableModel.addRow(sr.toArray());
-            }
-        }
-
-        @Override
-        public Member getInfo(Member member) {
-            ArrayList<SeminarRetreat> srList = new ArrayList<SeminarRetreat>();
-            for (int row = 0; row < defaultTableModel.getRowCount(); row++) {
-                String org = (String) defaultTableModel.getValueAt(row, 0);
-                String role = (String) defaultTableModel.getValueAt(row, 1);
-                srList.add(new SeminarRetreat(org, role));
-            }
-            member.setSeminarRetreatList(srList);
-            return member;
-        }
-    }
-
-    public class OtherPanel extends FormPanel {
-        private JTextArea jtaSpecialSkills, jtaIllness;
-        private SeminarsTablePanel seminarsTablePanel;
-
-        private OtherPanel() {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBorder(BorderFactory.createTitledBorder("Other"));
-            JLabel jlSpecialSkills = new JLabel("Special Skills:");
-            jtaSpecialSkills = new JTextArea();
-            jtaSpecialSkills.setPreferredSize(new Dimension(200, 100));
-            JLabel jlIllness = new JLabel("Illness:");
-            jtaIllness = new JTextArea();
-            jtaIllness.setPreferredSize(new Dimension(200, 100));
-
-            seminarsTablePanel = new SeminarsTablePanel();
-
-            JPanel jpTop = new JPanel(new GridLayout(2,2,5,5));
-            jpTop.add(jlSpecialSkills);
-            jpTop.add(jtaSpecialSkills);
-            jpTop.add(jlIllness);
-            jpTop.add(jtaIllness);
-
-            add(jpTop);
-            add(seminarsTablePanel);
-        }
-
-        public void setInfo(Member member) {
-            jtaSpecialSkills.setText(member.getSpecialSkills());
-            jtaIllness.setText(member.getIllness());
-            seminarsTablePanel.setInfo(member);
-        }
-
-        @Override
-        public Member getInfo(Member member) {
-            String specialSkills = jtaSpecialSkills.getText();
-            String illness = jtaIllness.getText();
-            member.setSpecialSkills(specialSkills);
-            member.setIllness(illness);
-            member = seminarsTablePanel.getInfo(member);
-            return member;
-        }
-    }
-
+    
     private class BottomPanel extends JPanel {
         private BottomPanel() {
             setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -659,7 +424,7 @@ public class MemberInfoPanel extends JPanel {
         }
     }
 
-    public MemberInfoPanel(MainWindow mainWindow) {
+    public MemberInfoPanel(MainWindow mainWindow, ExternalResource externalResource) {
         this.mainWindow = mainWindow;
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(20, 20, 20, 20) );
@@ -688,18 +453,10 @@ public class MemberInfoPanel extends JPanel {
         SchoolPanel schoolPanel = new SchoolPanel();
         c.gridx = 1; c.gridy = 3; c.gridwidth = 1;
         add(schoolPanel, c);
-
-        ParentPanel parentPanel = new ParentPanel();
+        
+        FormPanel parentPanel = new ParentPanel();
         c.gridx = 0; c.gridy = 4; c.gridwidth = 2;
         add(parentPanel, c);
-
-        EmergencyContactPanel emergencyContactPanel = new EmergencyContactPanel();
-        c.gridx = 0; c.gridy = 5; c.gridwidth = 2;
-        add(emergencyContactPanel, c);
-
-        OtherPanel otherPanel = new OtherPanel();
-        c.gridx = 0; c.gridy = 6; c.gridwidth = 2;
-        add(otherPanel, c);
 
         panels = new ArrayList<FormPanel>();
         panels.add(briefingPanel);
@@ -708,18 +465,16 @@ public class MemberInfoPanel extends JPanel {
         panels.add(contactPanel);
         panels.add(schoolPanel);
         panels.add(parentPanel);
-        panels.add(emergencyContactPanel);
-        panels.add(otherPanel);
-
-        memberInfoPanelListener = new MemberInfoPanelListener(this);
+        
+        memberInfoPanelListener = new MemberInfoPanelListener(this, externalResource);
 
         BottomPanel bottomPanel = new BottomPanel();
         c.gridx = 0; c.gridy = 7; c.gridwidth = 2;
         add(bottomPanel, c);
     }
 
-    public MemberInfoPanel(MainWindow mainWindow, Member member) {
-        this(mainWindow);
+    public MemberInfoPanel(MainWindow mainWindow, Member member, ExternalResource externalResource) {
+        this(mainWindow, externalResource);
         this.member = member;
         if (member.getFirstName() == null) {
             briefingPanel.setInfoForNewMember(member);
@@ -736,8 +491,11 @@ public class MemberInfoPanel extends JPanel {
 
     public void updateMember() {
         for (FormPanel panel: panels) {
-            panel.getInfo(member);
+            member = panel.getInfo(member);
         }
+    }
+    
+    public void changeMainWindow() {
         mainWindow.changeCenterPanelToMember(member);
     }
 
@@ -745,7 +503,9 @@ public class MemberInfoPanel extends JPanel {
         this.member = member;
     }
 
-    public Member getMember() { return member; }
+    public Member getMember() {
+    	return member; 
+	}
 
     private void deletePerson() {
         PersonList personList = PersonList.getInstance();

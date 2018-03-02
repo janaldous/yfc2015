@@ -1,31 +1,35 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.files.ExternalResource;
 import yfcdb.member.Member;
-import yfcdb.member.MemberList;
 import yfcdb.member.PersonList;
 
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by janaldoustorres on 25/05/15.
  */
 public class MemberInfoPanelListener implements ActionListener {
-    private ArrayList<FormPanel> panels;
+    private List<FormPanel> panels;
     private MemberInfoPanel memberInfoPanel;
+    private ExternalResource externalResource;
 
     public MemberInfoPanelListener() {
         panels = new ArrayList<FormPanel>();
     }
-
-    public MemberInfoPanelListener(MemberInfoPanel memberInfoPanel) {
+    
+    public MemberInfoPanelListener(MemberInfoPanel memberInfoPanel, ExternalResource externalResource) {
+    	this();
         this.memberInfoPanel = memberInfoPanel;
-        panels = new ArrayList<FormPanel>();
+    	this.externalResource = externalResource;
     }
 
-    public void addPanels(ArrayList<FormPanel> panels) {
+    public void addPanels(List<FormPanel> panels) {
         this.panels.addAll(panels);
     }
 
@@ -38,14 +42,19 @@ public class MemberInfoPanelListener implements ActionListener {
             }
         }
         if (success) {
-            JOptionPane.showMessageDialog(null, "Success");
             memberInfoPanel.updateMember();
+        	Member member = memberInfoPanel.getMember();
+            externalResource.updateOrSaveMember(member);
+            memberInfoPanel.changeMainWindow();
+            
             PersonList personList = PersonList.getInstance();
-            Member member = memberInfoPanel.getMember();
+
             if (!personList.contains(member)) {
                 personList.addPerson(member);
                 personList.print();
             }
+            
+            JOptionPane.showMessageDialog(null, "Success");
         } else {
             JOptionPane.showMessageDialog(null, "Not filled out");
         }

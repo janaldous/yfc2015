@@ -1,47 +1,91 @@
 package yfcdb.member;
 
+import java.io.Serializable;
+import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
- * Created by janaldoustorres on 19/05/15.
+ * An abstract class. For the creation of Person objects
+ * @author Jat Torres
+ * @version 20.02.2018
  */
-public class Person {
-    protected Date dateLastUpdated;
-    protected String username, password;
-    protected static int numberOfMembers = 0;
+@MappedSuperclass
+public abstract class Person implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8025959945849268362L;
 
-    protected Address address;
-    protected String id;
-    protected Position position;
-    protected String firstname, middlename, lastname, nickname;
-    protected YFCGroup group;
-    protected String gender;
-    protected String cellphoneNumber;
-    protected String email;
-    protected Date birthday;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+    protected int id;
+	
+	@Column(name="date_created")
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date dateLastCreated;
+	
+	@Column(name="date_last_updated")
+	@UpdateTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date dateLastUpdated;
+    
+	@Column(name="first_name")
+	protected String firstname;
+    
+	@Column(name="middle_name")
+	protected String middlename;
+    
+	@Column(name="last_name")
+	protected String lastname;
+	
+	@Column(name="nickname")
+	protected String nickname;
+	
+	@Enumerated(EnumType.ORDINAL)
+	protected Gender gender;
+	
+	@Column(name="cell_number")
+	protected String cellphoneNumber;
+	
+	@Column(name="email")
+	protected String email;
+	
     protected final static SimpleDateFormat dt = new SimpleDateFormat("MM/dd/yyyy");
-    protected int yfcEntryYear;
-    protected ShirtSize shirtSize;
-
+    
+    protected static Calendar cal = Calendar.getInstance();
+        
     public Person() {
-        setID(numberOfMembers++);
-        setUsername();
-        setDateUpdated();
-
-        address = new Address();
     }
-
-    public Person(Position pos, String fn, String mn, String ln, String nn, YFCGroup group) {
-        this();
-        position = pos;
-        firstname = fn;
-        middlename = mn;
-        lastname = ln;
-        nickname = nn;
-        this.group = group;
+    
+    /**
+     * Creates a person.
+     * @param fn
+     * @param mn
+     * @param ln
+     * @param nn
+     */
+    public Person(String fn, String mn, String ln, String nn) {
+	    this();
+	    firstname = fn;
+	    middlename = mn;
+	    lastname = ln;
+	    nickname = nn;
     }
 
     /**
@@ -49,14 +93,18 @@ public class Person {
      */
     @Override
     public String toString() {
-        return nickname + " " + lastname + " (" + position + ")";
+        return nickname + " " + lastname;
     }
 
     public void setFirstName(String firstname) {
         this.firstname = firstname;
     }
+    
+    public int getId() {
+		return id;
+	}
 
-    /**
+	/**
      * @return	firstname first name of member
      */
     public String getFirstName() {
@@ -97,83 +145,10 @@ public class Person {
     }
 
     /**
-     * sets username and timestamps update
-     */
-    public void setUsername() {
-        username = getID();
-        setDateUpdated();
-    }
-
-    /**
-     * @return username username of member
-     */
-    public String getUsername()
-    {
-        return username;
-    }
-
-    /**
-     * sets password and timestamps update
-     */
-    public void setPassword(String pw) {
-        password = pw;
-        setDateUpdated();
-    }
-
-    /**
-     * @return password password of member
-     */
-    public String getPassword()
-    {
-        return password;
-    }
-
-    /**
-     * sets id of memeber and timestamps update
-     */
-    public void setID(int rec) {
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        String memberNo = String.format("%04d", (rec));
-        id = year + "-" + memberNo;
-        setDateUpdated();
-    }
-
-    /**
-     * @return id id of member
-     */
-    public String getID()
-    {
-        return id;
-    }
-    /**
-     * @return position position of member
-     */
-    public Position getPosition() {
-
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    /**
-     * timestamps method whenever there is a change to member fields
-     */
-    public void setDateUpdated() {
-        //get current date time with Date()
-        Date date = new Date();
-        dateLastUpdated = date;
-    }
-
-    /**
      * @return date last date record was changed
      */
-    public String getDateUpdated() {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        String date = dateFormat.format(this.dateLastUpdated);
-        return date;
+    public Date getDateUpdated() {
+        return dateLastUpdated;
     }
 
     public String getCellphoneNumber() {
@@ -198,84 +173,11 @@ public class Person {
 
     public String getShortName() { return nickname + " " + lastname; }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(int month, int day, int year) {
-        Calendar c = Calendar.getInstance();
-        c.set(year, month-1, day);
-        this.birthday = c.getTime();
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public int getAge() {
-        Calendar calBirthday = Calendar.getInstance();
-        Calendar calToday = Calendar.getInstance();
-        calBirthday.setTime(birthday);
-
-        int age = calToday.get(Calendar.YEAR) - calBirthday.get(Calendar.YEAR);
-
-        if (calToday.get(Calendar.MONTH) < calBirthday.get(Calendar.MONTH)) {
-            age--;
-        } else if ((calToday.get(Calendar.MONTH) == calBirthday.get(Calendar.MONTH))
-                && (calToday.get(Calendar.DAY_OF_MONTH) < calBirthday.get(Calendar.DAY_OF_MONTH))) {
-            age--;
-        }
-        return age;
-    }
-
-    public Object[] toArray() {
-        return new Object[] {this, position, lastname, firstname, dt.format(birthday), cellphoneNumber};
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public int getYfcAge() {
-        Calendar cal = Calendar.getInstance();
-        return cal.get(Calendar.YEAR) - yfcEntryYear;
-    }
-
-    public int getYfcEntryYear() {
-        return this.yfcEntryYear;
-    }
-
-    public void setYfcEntryYear(int yfcEntryYear) {
-        this.yfcEntryYear = yfcEntryYear;
-    }
-
-    public ShirtSize getShirtSize() {
-        return shirtSize;
-    }
-
-    public void setShirtSize(ShirtSize shirtSize) {
-        this.shirtSize = shirtSize;
-    }
-
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (obj == this) {
-//            return true;
-//        } else if (obj instanceof Person && ((Person)obj).id == this.id) {
-//            return true;
-//        }
-//        return false;
-//    }
 }

@@ -1,10 +1,30 @@
 package yfcdb.member;
 
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Embeddable;
+
 /**
- * Created by janaldoustorres on 19/05/15.
+ * @author Jat Torres
+ * @version 21.02.2018
  */
-public class Education {
-    private String school, level, course;
+@Embeddable
+public class Education implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3338285871547069507L;
+	
+	@Basic
+	private String school;
+	
+	@Basic
+	private String level;
+	
+	@Basic
+	private String course;
+	
     private final static String blank = "";
 
     public Education() {

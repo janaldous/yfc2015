@@ -1,49 +1,85 @@
 package yfcdb.member;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 /**
- * Created by janaldoustorres on 19/05/15.
+ * @author Jat Torres
+ * @version 21.02.2018
  */
+@Embeddable
 public class Address {
-    private String street, city, village, postalCode;
+
+	@Column(name="address_line_1")
+    private String address1;
+	
+	@Column(name="address_line_2")
+    private String address2;
+    
+    @Column(name="address_city")
+    private String city;
+    
+    @Column(name="address_province")
+    private String province;
+    
+    @Column(name="address_postcode")
+    private String postalCode;
 
     public Address() {}
 
-    public Address(String street, String city, String village, String postalCode) {
-        this.street = street;
+    public Address(String address1, String address2, String city, 
+    		String province, String postalCode) {
+        this.address1 = address1;
+        this.address2 = address2;
         this.city = city;
-        this.village = village;
+        this.province = province;
         this.postalCode = postalCode;
     }
 
-    public String getStreet() {
-        return street;
-    }
+	public String getAddress1() {
+		return address1;
+	}
 
-    public void setStreet(String street) {
-        this.street = street;
-    }
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
 
-    public String getCity() {
-        return city;
-    }
+	public String getAddress2() {
+		return address2;
+	}
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
 
-    public String getVillage() {
-        return village;
-    }
+	public String getCity() {
+		return city;
+	}
 
-    public void setVillage(String village) {
-        this.village = village;
-    }
+	public void setCity(String city) {
+		this.city = city;
+	}
 
-    public String getPostalCode() {
-        return postalCode;
-    }
+	public String getProvince() {
+		return province;
+	}
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+    
+	public String getFullAddress() {
+    	return address1 + ", " + address2 + ", " + city + ", "
+    			+ province + " " + postalCode;
     }
 }

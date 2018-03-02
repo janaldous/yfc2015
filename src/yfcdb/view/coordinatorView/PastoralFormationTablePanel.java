@@ -1,15 +1,19 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.events.Attendee;
 import yfcdb.events.Event;
 import yfcdb.events.EventList;
 import yfcdb.events.EventType;
 import yfcdb.events.Role;
+import yfcdb.files.ExternalResource;
+import yfcdb.member.Member;
 import yfcdb.member.Person;
 import yfcdb.member.PersonList;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created by janaldoustorres on 05/06/15.
@@ -25,6 +30,8 @@ import java.util.Map;
 public class PastoralFormationTablePanel extends JPanel implements TablePanelTemplate {
     private final DefaultTableModel defaultTableModel;
     final static SimpleDateFormat dt = new SimpleDateFormat("MM/dd/yyyy");
+    private ExternalResource externalResource;
+	private JLabel jlNoOfRows;
 
     private class FilterPanel extends JPanel {
         private final String[] attendToggleArr = {"Attended", "Did not attend"};
@@ -47,10 +54,15 @@ public class PastoralFormationTablePanel extends JPanel implements TablePanelTem
         }
     }
 
-    public PastoralFormationTablePanel() {
+    public PastoralFormationTablePanel(ExternalResource externalResource) {
+    	this.externalResource = externalResource;
         setLayout(new BorderLayout());
-
+        
+        JPanel jpTitle = new JPanel();
         JLabel jlTitle = new JLabel("<html><h1>Pastoral Formation Table</h1></html>");
+        jlNoOfRows = new JLabel();
+        jpTitle.add(jlTitle);
+        jpTitle.add(jlNoOfRows);
 
         String[] columnNames = {"Type", "Member", "Role", "Date"};
         defaultTableModel = new DefaultTableModel(columnNames, 0);
@@ -60,7 +72,7 @@ public class PastoralFormationTablePanel extends JPanel implements TablePanelTem
 
         //if pastoral formation even type is typed in then show members who have attended that pastoral formation event
 
-        add(jlTitle, BorderLayout.NORTH);
+        add(jpTitle, BorderLayout.NORTH);
         add(new JScrollPane(jtMembers), BorderLayout.CENTER);
         add(new FilterPanel(), BorderLayout.SOUTH);
     }
@@ -79,25 +91,25 @@ public class PastoralFormationTablePanel extends JPanel implements TablePanelTem
         defaultTableModel.setRowCount(0);
 
         PersonList personList = PersonList.getInstance();
-        ArrayList<Person> personNotAttendedArrayList = personList.getPersonArrayList();
+        List<Member> personNotAttendedArrayList = new ArrayList<Member>(personList.getPersonArrayList());
 
         EventList eventList = EventList.getInstance();
         ArrayList<Event> eventArrayList = eventList.getEventsOfType(type);
 
         for (Event event: eventArrayList) {
-            HashMap<Person, Role> personRoleHashMap = event.getAttendees();
+            List<Attendee> attendes = externalResource.getEventAttendees(event);
 
-            Iterator iterator = personRoleHashMap.entrySet().iterator();
+            Iterator<Attendee> iterator = externalResource.getEventAttendeesIterator(event);
 
             while (iterator.hasNext()) {
-                Map.Entry pair = (Map.Entry)iterator.next();
+            	Attendee attendee = (Attendee)iterator.next();
                 //add to model if person attended
-                Person person = (Person)pair.getKey();
-                Role role = (Role)pair.getValue();
-                Object[] array = {type, person.getShortName(), role, dt.format(event.getStartDate())};
+                Member member = attendee.getMember();
+                Role role = attendee.getRole();
+                Object[] array = {type, member.getShortName(), role, dt.format(event.getStartDate())};
                 defaultTableModel.addRow(array);
                 //remove from list if attended
-                personNotAttendedArrayList.remove(person);
+                personNotAttendedArrayList.remove(member);
             }
         }
 
@@ -109,5 +121,8 @@ public class PastoralFormationTablePanel extends JPanel implements TablePanelTem
                 defaultTableModel.addRow(array);
             }
         }
+        
+        int noOfRows = defaultTableModel.getRowCount();
+        jlNoOfRows.setText(noOfRows + " rows");
     }
 }

@@ -5,21 +5,71 @@ import yfcdb.member.Person;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.MapKey;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Formula;
 
 /**
  * Created by janaldoustorres on 19/05/15.
  */
+@Entity
+@Table(name="event")
 public class Event {
-    private static int id = 0;
-    private String name, venue, notes;
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+    private int id;
+	
+    private String name;
+    
+    private String venue;
+    
+    private String notes;
+    
+    @Enumerated(EnumType.ORDINAL)
     private EventType type;
-    private int regFee;
-    private Date startDate, endDate;
-    //private ArrayList<Attendee> attendeesList = new ArrayList<Attendee>();
-    private HashMap<Person, Role> attendeesMap = new HashMap<Person, Role>();
-    protected final static SimpleDateFormat dt = new SimpleDateFormat("MM/dd/yyyy");
+    
+    private double regFee;
+    
+    @Temporal(TemporalType.DATE)
+    private Date startDate;
+    
+    @Temporal(TemporalType.DATE)
+    private Date endDate;
+    
+    @ElementCollection
+    private List<Attendee> attendees;
 
+    protected final static SimpleDateFormat dt = new SimpleDateFormat("MM/dd/yyyy");
+    
+    protected static Calendar cal = Calendar.getInstance();
+    
     public Event(String name, EventType type, String venue, String notes, int regFee, Date startDate, Date endDate)
     {
         this();
@@ -35,6 +85,7 @@ public class Event {
 
     public Event() {
         //id++;
+        attendees = new ArrayList<Attendee>();
     }
 
     /**
@@ -101,14 +152,14 @@ public class Event {
      * gets regFee
      * @return the regFee
      */
-    public int getRegFee() {
+    public double getRegFee() {
         return regFee;
     }
 
     /**
      * @param regFee the regFee to set
      */
-    public void setRegFee(int regFee) {
+    public void setRegFee(double regFee) {
         this.regFee = regFee;
     }
 
@@ -116,8 +167,9 @@ public class Event {
      * gets noOfAttendees
      * @return the noOfAttendees
      */
+    
     public int getNoOfAttendees() {
-        return attendeesMap.size();
+        return attendees.size();
     }
 
     /**
@@ -150,19 +202,12 @@ public class Event {
         this.endDate = endDate;
     }
 
-    /**
-     * @param id the id to set
-     */
-    public static void setId(int id) {
-        Event.id = id;
+    public int getId() {
+        return id;
     }
 
-    public String getId() {
-        return Integer.toString(id);
-    }
-
-    public void addAttendee(Person p, Role r) {
-        attendeesMap.put(p, r);
+    public void addAttendee(Member m, Role r) {
+        attendees.add(new Attendee(m, r));
     }
 
     public String toString() {
@@ -173,23 +218,22 @@ public class Event {
     }
 
     public Object[] toArray() {
-        return new Object[] {dt.format(startDate), this, type, venue, notes, getNoOfAttendees()};
+        return new Object[] {dt.format(startDate), this, type, venue, notes, attendees.size()};
     }
 
-    public Object[] toArray(Person person) {
-        return new Object[] {dt.format(startDate), this, attendeesMap.get(person)};
+    public List<Attendee> getAttendees() {
+        return attendees;
+    }
+    
+    public void setAttendees(List<Attendee> attendees) {
+    	this.attendees = attendees;
     }
 
-    public HashMap<Person, Role> getAttendees() {
-        return attendeesMap;
-    }
-
-    public boolean wasAttendedBy(Person person) {
-        return attendeesMap.containsKey(person);
+    public boolean wasAttendedBy(Member member) {
+        return attendees.contains(member);
     }
 
     public boolean wasOn(int month, int year) {
-        Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
         if (cal.get(Calendar.MONTH) == month && cal.get(Calendar.YEAR) == year) {
             return true;
@@ -198,14 +242,7 @@ public class Event {
     }
 
     public int getDay() {
-        Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
         return cal.get(Calendar.DAY_OF_MONTH);
-    }
-
-    public ArrayList<Person> getPersonsWhoAttended() {
-        ArrayList<Person> personArrayList = new ArrayList<Person>();
-        personArrayList.addAll(attendeesMap.keySet());
-        return personArrayList;
     }
 }

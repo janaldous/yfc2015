@@ -55,4 +55,10 @@ public abstract class EventFormPanel extends JPanel {
     }
 
     public abstract Event getInfo(Event event);
+    
+    public abstract void updateEvent();
+    
+    public abstract Event getEvent();
+    
+    //public abstract void changeMainWindow();
 }

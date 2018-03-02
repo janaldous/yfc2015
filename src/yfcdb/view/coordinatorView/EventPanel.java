@@ -27,7 +27,7 @@ public class EventPanel extends EventFormPanel {
 
     public EventPanel() {
         setLayout(new GridLayout(7,2));
-
+        
         JLabel jlEventName = new JLabel("Name of Event *:");
         jtfEventName = new JTextField("");
         jtfEventName.setEditable(false);
@@ -38,14 +38,16 @@ public class EventPanel extends EventFormPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 EventType selectedType = (EventType)jcbEventType.getSelectedItem();
-                if (selectedType.equals(EventType.OTHERS) || selectedType.equals(EventType.PARISH_LINKAGE)
-                        || selectedType.equals(EventType.SECTOR_CONFERENCE)
-                        || selectedType.equals(EventType.PROVINCIAL_CONFERENCE)
-                        || selectedType.equals(EventType.REGIONAL_CONFERENCE)) {
-                    jtfEventName.setEditable(true);
-                } else {
-                    jtfEventName.setText("");
-                    jtfEventName.setEditable(false);
+                if(selectedType != null) {
+                	if (selectedType.equals(EventType.OTHERS) || selectedType.equals(EventType.PARISH_LINKAGE)
+                            || selectedType.equals(EventType.SECTOR_CONFERENCE)
+                            || selectedType.equals(EventType.PROVINCIAL_CONFERENCE)
+                            || selectedType.equals(EventType.REGIONAL_CONFERENCE)) {
+                        jtfEventName.setEditable(true);
+                    } else {
+                        jtfEventName.setText(selectedType.toString());
+                        jtfEventName.setEditable(false);
+                    }
                 }
             }
         });
@@ -80,6 +82,11 @@ public class EventPanel extends EventFormPanel {
         add(jlNotes);
         add(jtfNotes);
     }
+    
+    public EventPanel(Event event) {
+    	this();
+    	this.event = event;
+    }
 
     @Override
     public void setInfo(Event event) {
@@ -99,8 +106,10 @@ public class EventPanel extends EventFormPanel {
         Date start = startDatePanel.getDate();
         Date end = endDatePanel.getDate();
         String venue = jtfVenue.getText();
-        int regFee = Integer.parseInt(jtfRegFee.getText());
+        double regFee = Double.parseDouble(jtfRegFee.getText());
         String notes = jtfNotes.getText();
+        
+        System.out.println(start);
 
         event.setName(eventName);
         event.setType(eventType);
@@ -116,22 +125,27 @@ public class EventPanel extends EventFormPanel {
     @Override
     public boolean isFilledOut() {
         try {
-            Integer.parseInt(jtfRegFee.getText());
+            Double.parseDouble(jtfRegFee.getText());
         } catch (Exception e) {
-            return false;
+        	JOptionPane.showMessageDialog(null, "Reg fee must be a double");
+        	return false;
         }
         if (jcbEventType.getSelectedItem().equals("") || jtfVenue.getText().equals("")
                 || jtfRegFee.getText().equals("")) {
+        	JOptionPane.showMessageDialog(null, "Fill out required fields");
             return false;
         }
         return true;
     }
-
-    public void updateEvent(Event event) {
-        getInfo(event);
+    
+    @Override
+    public void updateEvent() {
+    	event = getInfo(event);
     }
-
+    
+    @Override
     public Event getEvent() {
+    	updateEvent();
         return event;
     }
 

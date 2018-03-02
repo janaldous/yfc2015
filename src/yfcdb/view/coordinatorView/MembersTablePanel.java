@@ -1,15 +1,17 @@
 package yfcdb.view.coordinatorView;
 
+import yfcdb.member.Member;
 import yfcdb.member.Person;
 import yfcdb.member.PersonList;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by janaldoustorres on 31/05/15.
@@ -91,8 +93,8 @@ public class MembersTablePanel extends JPanel {
 
     private void populateTable() {
         PersonList personList = PersonList.getInstance();
-        ArrayList<Person> personArrayList = personList.getPersonArrayList();
-        for (Person person: personArrayList) {
+        List<Member> personArrayList = personList.getPersonArrayList();
+        for (Member person: personArrayList) {
             defaultTableModel.addRow(person.toArray());
         }
     }

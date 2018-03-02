@@ -32,20 +32,20 @@ public class PersonInfoPanelListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean success = true;
-        for (PersonFormPanel panel: panels) {
+        for (PersonFormPanel<?> panel: panels) {
             if (!panel.isFilledOut()) {
                 success = false;
             }
         }
         if (success) {
-            JOptionPane.showMessageDialog(null, "Success");
             personInfoPanel.updatePerson();
             PersonList personList = PersonList.getInstance();
-            Person person = personInfoPanel.getPerson();
+            Member person = (Member) personInfoPanel.getPerson();
             if (!personList.contains(person)) {
                 personList.addPerson(person);
                 personList.print();
             }
+            JOptionPane.showMessageDialog(null, "Success");
         } else {
             JOptionPane.showMessageDialog(null, "Not filled out");
         }

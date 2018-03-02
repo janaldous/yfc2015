@@ -4,7 +4,7 @@ package yfcdb.member;
  * Created by janaldoustorres on 19/05/15.
  */
 public enum BloodType {
-    Opos, Oneg, Apos, Aneg, Bpos, Bneg, ABpos, ABneg;
+    Opos, Oneg, Apos, Aneg, Bpos, Bneg, ABpos, ABneg, IDK;
 
     public String toString() {
         switch (this) {

@@ -5,11 +5,13 @@ import yfcdb.household.Household;
 /**
  * Created by janaldoustorres on 19/05/15.
  */
-public class HouseholdLeader extends Person {
+public class HouseholdLeader extends Member {
     private Household householdGroup;
 
-    public HouseholdLeader(String firstname, String middlename, String lastname, String nickname, YFCGroup group) {
-        super(Position.HOUSEHOLD_HEAD, firstname, middlename, lastname, nickname, group);
+    public HouseholdLeader(String firstname, String middlename, String lastname, String nickname, 
+    		String contactNo) {
+        super(firstname, middlename, lastname, nickname, contactNo);
+        position = Position.HOUSEHOLD_HEAD;
     }
 
     public Household getHouseholdGroup() {

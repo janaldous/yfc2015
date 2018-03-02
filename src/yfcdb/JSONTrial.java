@@ -22,7 +22,7 @@ public class JSONTrial {
         jat.setCellphoneNumber("0924090");
         jat.setEmail("jat.torres@gmail.com");
         jat.setEducation(new Education("Brent", "G12", "Comp sci"));
-        jat.setFather(new Parent("Father", "Mike", "Supervisor", "089423", "mikelsie05@gmail.com"));
+        jat.setFather(new Parent(Relationship.FATHER, "Mike", "Torres", "Supervisor", "089423", "mikelsie05@gmail.com"));
         Coordinator mom = new Coordinator(Prefix.TITA, "Elsie", "Turla", "Torres", "Elsie", chapterC);
         mom.setEmail("etorres@brent.edu.ph");
         mom.setCellphoneNumber("083423432");

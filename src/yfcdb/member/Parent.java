@@ -1,65 +1,103 @@
 package yfcdb.member;
 
-import java.util.List;
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * Created by janaldoustorres on 19/05/15.
  */
-public class Parent extends Person {
-    private String name, occupation, contact, email, relationship;
+@Embeddable
+public class Parent {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6240157025593537347L;
+	
+	private String firstname;
+	
+	private String lastname;
+	
+	private String cellphoneNumber;
+	
+	private String email;
+	
+    private String occupation;
+    
+    @Enumerated(EnumType.STRING)
+    private Relationship relationship;
+    
     private boolean cfc;
-    private String sector, chapter;
-    private List otherOrganisations;
-    private Person person;
+    
+    private String otherOrganizations;
+    
     public Parent() {
 
     }
 
-    public Parent(String relationship, Coordinator coordinator) {
+    public Parent(Relationship relationship, Coordinator coordinator) {
         this.relationship = relationship;
-        this.person = coordinator;
+        this.firstname = coordinator.getFirstName();
+        this.lastname = coordinator.getLastname();
     }
 
-    public Parent(String relationship, Coordinator coordinator, String occupation) {
+    public Parent(Relationship relationship, Coordinator coordinator, String occupation) {
         this.relationship = relationship;
-        this.person = coordinator;
-        this.name = coordinator.getFullName();
+        this.firstname = coordinator.getFirstName();
+        this.lastname = coordinator.getLastname();
         this.occupation = occupation;
-        this.contact = coordinator.getCellphoneNumber();
+        this.cellphoneNumber = coordinator.getCellphoneNumber();
         this.email = coordinator.getEmail();
-        this.cfc = false;
+        this.setCfc(false);
     }
 
-    public Parent(String relationship, String name, String occupation, String contact, String email) {
+    public Parent(Relationship relationship, String firstname, String middlename,
+    		String lastname, String nickname, String occupation, 
+    		String cellphoneNumber, String email) {
         this.relationship = relationship;
-        this.name = name;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.occupation = occupation;
-        this.contact = contact;
+        this.cellphoneNumber = cellphoneNumber;
         this.email = email;
-        this.cfc = false;
+        this.setCfc(false);
     }
 
-    public Parent(String relationship, String name, String occupation, String contact, String email, boolean cfc, String sector, String chapter) {
+    public Parent(Relationship relationship, String firstname, String middlename,
+    		String lastname, String nickname, String occupation, String cellphoneNumber, 
+    		String email, boolean cfc) {
         this.relationship = relationship;
-        this.name = name;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.occupation = occupation;
-        this.contact = contact;
+        this.cellphoneNumber = cellphoneNumber;
         this.email = email;
-        this.cfc = cfc;
-        this.sector = sector;
-        this.chapter = chapter;
+        this.setCfc(cfc);
+    }
+    
+    public Parent(Relationship relationship, String firstname, String lastname, 
+    		String occupation, String cellphoneNumber, String email) {
+        this.relationship = relationship;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.occupation = occupation;
+        this.cellphoneNumber = cellphoneNumber;
+        this.email = email;
     }
 
-    public void addOrg(String organization) {
-        otherOrganisations.add(organization);
+    public void setOrganizations(String organization) {
+    	otherOrganizations = organization;
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    
+    public String getOrganizations() {
+    	return otherOrganizations;
     }
 
     public String getOccupation() {
@@ -70,14 +108,6 @@ public class Parent extends Person {
         this.occupation = occupation;
     }
 
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -86,26 +116,39 @@ public class Parent extends Person {
         this.email = email;
     }
 
-    public EmergencyContact toEmergencyContact() {
-        return new EmergencyContact(this, name, relationship, contact);
-    }
-
-    public String getRelationship() {
+    public Relationship getRelationship() {
         return relationship;
     }
 
-    public Person getPerson() {
-        return person;
-    }
+	public boolean isCfc() {
+		return cfc;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (obj instanceof EmergencyContact && (((EmergencyContact) obj).getParent() != null)
-                && ((EmergencyContact) obj).getParent().equals(this)) {
-            return true;
-        }
-        return false;
-    }
+	public void setCfc(boolean cfc) {
+		this.cfc = cfc;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getCellphoneNumber() {
+		return cellphoneNumber;
+	}
+
+	public void setCellphoneNumber(String cellphoneNumber) {
+		this.cellphoneNumber = cellphoneNumber;
+	}
 }
